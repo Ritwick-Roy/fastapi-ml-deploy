@@ -1,0 +1,39 @@
+from pydantic import BaseModel
+
+class Symptoms(BaseModel):
+    muscle_weakness: int
+    coma: int
+    red_spots_over_body: int
+    high_fever: int
+    receiving_blood_transfusion: int
+    blood_in_sputum: int
+    rusty_sputum: int
+    pain_behind_the_eyes: int
+    slurred_speech: int
+    throat_irritation: int
+    enlarged_thyroid: int
+    increased_appetite: int
+    shivering: int
+    nodal_skin_eruptions: int
+    sunken_eyes: int
+    spotting_urination: int
+    lack_of_concentration: int
+    pus_filled_pimples: int
+    altered_sensorium: int
+    weakness_in_limbs: int
+    mucoid_sputum: int
+    unsteadiness: int
+    malaise: int
+    patches_in_throat: int
+    visual_disturbances: int
+    irritability: int
+    hip_joint_pain: int
+    movement_stiffness: int
+    passage_of_gases: int
+    bladder_discomfort: int
+    toxic_look_typhos: int
+    pain_during_bowel_movements: int
+    blister: int
+    ulcers_on_tongue: int
+    silver_like_dusting: int
+    history_of_alcohol_consumption: int
