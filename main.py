@@ -1,16 +1,21 @@
+from database import (
+    fetch_all_appts,
+    fetch_one_appt,
+    create_appt,
+    update_appt,
+    remove_appt,
+)
+import pandas as pd
+import numpy as np
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from model import Symptoms
+from model import Appointment, Symptoms, diseases as ds
 from xgboost import XGBClassifier
-# import pickle
-mod=XGBClassifier()
+mod = XGBClassifier()
 mod.load_model('xgmodel.json')
-import json
-import uvicorn
-import numpy as np
-import pandas as pd
 
-app=FastAPI()
+app = FastAPI()
 
 origins = ['http://localhost:3000']
 
@@ -22,68 +27,60 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get('/')
 async def home():
-    return {"message":"noasda"}
+    return {"message": "homepage"}
 
-@app.post('/predict')
-async def redict(symptoms: Request):
 
-    symptoms = await symptoms.json();
+@app.get("/api/appt")
+async def get_appt():
+    response = await fetch_all_appts()
+    return response
 
-    user_symptoms = [[
-        symptoms['muscle_weakness'],
-        symptoms['coma'],
-        symptoms['red_spots_over_body'],
-        symptoms['high_fever'],
-        symptoms['pain_behind_the_eyes'],
-        symptoms['receiving_blood_transfusion'],
-        symptoms['blood_in_sputum'],
-        symptoms['throat_irritation'],
-        symptoms['rusty_sputum'],
-        symptoms['slurred_speech'],
-        symptoms['increased_appetite'],
-        symptoms['enlarged_thyroid'],
-        symptoms['irritability'],
-        symptoms['nodal_skin_eruptions'],
-        symptoms['spotting_urination'],
-        symptoms['shivering'],
-        symptoms['malaise'],
-        symptoms['sunken_eyes'],
-        symptoms['pus_filled_pimples'],
-        symptoms['weakness_in_limbs'],
-        symptoms['lack_of_concentration'],
-        symptoms['visual_disturbances'],
-        symptoms['altered_sensorium'],
-        symptoms['unsteadiness'],
-        symptoms['bladder_discomfort'],
-        symptoms['passage_of_gases'],
-        symptoms['patches_in_throat'],
-        symptoms['belly_pain'],
-        symptoms['mucoid_sputum'],
-        symptoms['ulcers_on_tongue'],
-        symptoms['cramps'],
-        symptoms['swelling_of_stomach'],
-        symptoms['pain_during_bowel_movements'],
-        symptoms['hip_joint_pain'],
-        symptoms['red_sore_around_nose'],
-        symptoms['movement_stiffness'],
-    ]]
-    temp=['Fungal infection', 'Allergy', 'GERD', 'Chronic cholestasis',
-       'Drug Reaction', 'Peptic ulcer diseae', 'AIDS', 'Diabetes ',
-       'Gastroenteritis', 'Bronchial Asthma', 'Hypertension ', 'Migraine',
-       'Cervical spondylosis', 'Paralysis (brain hemorrhage)', 'Jaundice',
-       'Malaria', 'Chicken pox', 'Dengue', 'Typhoid', 'hepatitis A',
-       'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Hepatitis E',
-       'Alcoholic hepatitis', 'Tuberculosis', 'Common Cold', 'Pneumonia',
-       'Dimorphic hemmorhoids(piles)', 'Heart attack', 'Varicose veins',
-       'Hypothyroidism', 'Hyperthyroidism', 'Hypoglycemia',
-       'Osteoarthristis', 'Arthritis',
-       '(vertigo) Paroymsal  Positional Vertigo', 'Acne',
-       'Urinary tract infection', 'Psoriasis', 'Impetigo']
-    user_symptoms=pd.DataFrame(user_symptoms)
+
+@app.get("/api/appt/{patient}", response_model=Appointment)
+async def get_appt_by_id(patient):
+    response = await fetch_one_appt(patient)
+    if response:
+        return response
+    raise HTTPException(404, f"No appt found with patient: {patient}")
+
+
+@app.post("/api/appt", response_model=Appointment)
+async def post_appt(appt: Appointment):
+    print(type(appt))
+    response = await create_appt(appt.dict())
+    if response:
+        return response
+    raise HTTPException(400, "Bad request")
+
+
+@app.post('/api/predict')
+async def predict(symptoms: Request):
+    symptoms=await symptoms.json()
+    user_symptoms = pd.DataFrame([symptoms.values()])
     disease = mod.predict(user_symptoms)[0]
-    return {"simp":symptoms,"NO":temp[int(disease)]}
+    return {"pred": ds[int(disease)]}
 
-if __name__=="__main__":
-    uvicorn.run("disease:app")
+
+
+@app.put("/api/appt/{patient}",response_model=Appointment)
+async def put_appt(patient:str, appt:Appointment):
+    appt=appt.dict()
+    appt.patient=patient
+    response = await update_appt(patient,appt)
+    if response:
+        return response
+    raise HTTPException(404,f"No appt found with patient: {patient}")
+
+
+@app.delete("/api/appt/{patient}")
+async def delete_appt(patient):
+    response = await remove_appt(patient)
+    if response:
+        return "Deleted succesfully"
+    raise HTTPException(404,f"No appt found with patient: {patient}")
+
+if __name__ == "__main__":
+    uvicorn.run("app")

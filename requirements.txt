@@ -3,3 +3,6 @@ uvicorn >= 0.14.0
 motor >= 2.4.0
 numpy >= 1.23.0
 pandas >= 1.4.0
+email-validator==1.1.2
+PyJWT>=1.7.1
+python-decouple>=3.3

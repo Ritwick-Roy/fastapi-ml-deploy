@@ -1,5 +1,12 @@
 from pydantic import BaseModel
 
+class Appointment(BaseModel):
+    patient: str
+    doctor: str
+    date: str
+    address: str
+
+
 class Symptoms(BaseModel):
     muscle_weakness: int
     coma: int
@@ -37,3 +44,16 @@ class Symptoms(BaseModel):
     ulcers_on_tongue: int
     silver_like_dusting: int
     history_of_alcohol_consumption: int
+
+diseases = ['Fungal infection', 'Allergy', 'GERD', 'Chronic cholestasis',
+       'Drug Reaction', 'Peptic ulcer diseae', 'AIDS', 'Diabetes ',
+       'Gastroenteritis', 'Bronchial Asthma', 'Hypertension ', 'Migraine',
+       'Cervical spondylosis', 'Paralysis (brain hemorrhage)', 'Jaundice',
+       'Malaria', 'Chicken pox', 'Dengue', 'Typhoid', 'hepatitis A',
+       'Hepatitis B', 'Hepatitis C', 'Hepatitis D', 'Hepatitis E',
+       'Alcoholic hepatitis', 'Tuberculosis', 'Common Cold', 'Pneumonia',
+       'Dimorphic hemmorhoids(piles)', 'Heart attack', 'Varicose veins',
+       'Hypothyroidism', 'Hyperthyroidism', 'Hypoglycemia',
+       'Osteoarthristis', 'Arthritis',
+       '(vertigo) Paroymsal  Positional Vertigo', 'Acne',
+       'Urinary tract infection', 'Psoriasis', 'Impetigo']
