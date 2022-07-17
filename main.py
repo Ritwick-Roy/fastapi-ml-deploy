@@ -17,7 +17,7 @@ mod.load_model('xgmodel.json')
 
 app = FastAPI()
 
-origins = ['http://localhost:3000']
+origins = ['http://localhost:3000','https://sputnik-healthcare.netlify.app']
 
 app.add_middleware(
     CORSMiddleware,
